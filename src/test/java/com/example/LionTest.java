@@ -11,7 +11,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.lenient;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LionTest {
@@ -22,13 +21,10 @@ public class LionTest {
     @Test
     public void getKittensReturnCorrectValue() throws Exception {
         // Настроим поведение мок-объекта для использования в тесте
-        lenient().when(feline.getKittens()).thenReturn(1);
+        Mockito.when(feline.getKittens()).thenReturn(1);
 
-        // Используем конструктор Lion, который не принимает Feline
-        Lion lion = new Lion("Самец");
-
-        // Подменим внутреннюю зависимость на наш мок
-        lion.feline = feline; // Это позволяет использовать мок-объект
+        // Используем конструктор Lion с инъекцией зависимости
+        Lion lion = new Lion("Самец", feline);
 
         // Получаем количество детенышей
         int actualAmountOfKittens = lion.getKittens();
@@ -39,7 +35,7 @@ public class LionTest {
 
     @Test
     public void doesHaveManeShouldReturnTrueForMaleLion() throws Exception {
-        Lion lion = new Lion("Самец");
+        Lion lion = new Lion("Самец", feline);
 
         boolean actualResult = lion.doesHaveMane();
 
@@ -48,7 +44,7 @@ public class LionTest {
 
     @Test
     public void doesHaveManeShouldReturnFalseForFemaleLion() throws Exception {
-        Lion lion = new Lion("Самка");
+        Lion lion = new Lion("Самка", feline);
 
         boolean actualResult = lion.doesHaveMane();
 
@@ -57,20 +53,17 @@ public class LionTest {
 
     @Test(expected = Exception.class)
     public void lionConstructorShouldThrowExceptionForInvalidGender() throws Exception {
-        new Lion("Тест");
+        new Lion("Тест", feline);
     }
 
     @Test
     public void getFoodTest() throws Exception {
         // Настроим поведение мок-объекта для использования в тесте
         List<String> expectedList = List.of("Животные", "Птицы", "Рыба");
-        lenient().when(feline.getFood("Хищник")).thenReturn(expectedList);
+        Mockito.when(feline.getFood("Хищник")).thenReturn(expectedList);
 
-        // Используем конструктор Lion, который не принимает Feline
-        Lion lion = new Lion("Самка");
-
-        // Подменим внутреннюю зависимость на наш мок
-        lion.feline = feline; // Это позволяет использовать мок-объект
+        // Используем конструктор Lion с инъекцией зависимости
+        Lion lion = new Lion("Самка", feline);
 
         // Получаем еду
         List<String> actualList = lion.getFood();
